@@ -55,3 +55,16 @@ Proyecto académico desarrollado como ejercicio de administración y visualizaci
 
 ## Versión
 1.0.0
+## Datos de ejemplo
+
+El proyecto incluye un inventario de prueba con equipos
+de diferentes fabricantes, distribuidos en tres racks.
+
+Los datos son ficticios y pueden modificarse desde
+el dashboard según las necesidades del inventario.
+
+## Mantenimiento del proyecto
+
+Se pueden agregar nuevos equipos, actualizar sus datos
+y eliminar registros desde la interfaz principal.
+También es posible importar y exportar información
