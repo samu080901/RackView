@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RackView | Gestión de infraestructura</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">R</div>
+                <div>
+                    <h2>RackView</h2>
+                    <span>INFRASTRUCTURE</span>
+                </div>
+            </div>
+
+            <p class="menu-label">PRINCIPAL</p>
+            <nav>
+                <a href="#" class="nav-link active">▦ <span>Dashboard</span></a>
+                <a href="#inventario" class="nav-link">▤ <span>Inventario</span></a>
+                <a href="#racks" class="nav-link">▥ <span>Racks</span></a>
+                <a href="#actividad" class="nav-link">◷ <span>Actividad</span></a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="status-indicator"></div>
+                <div>
+                    <strong>Sistema operativo</strong>
+                    <small>Todos los servicios activos</small>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <span class="breadcrumb">Infraestructura /</span>
+                    <strong> Dashboard</strong>
+                </div>
+                <div class="topbar-right">
+                    <span class="system-tag">● Sistema activo</span>
+                    <div class="avatar">RV</div>
+                </div>
+            </header>
+
+            <section class="welcome">
+                <div>
+                    <p class="eyebrow">CENTRO DE CONTROL</p>
+                    <h1>Panel de infraestructura</h1>
+                    <p>Monitorea y administra tus equipos y racks desde un solo lugar.</p>
+                </div>
+                <div class="date-label" id="currentDate"></div>
+            </section>
+
+            <section class="stats-grid">
+                <article class="stat-card">
+                    <span class="stat-label">Equipos registrados</span>
+                    <h2 id="totalEquipos">0</h2>
+                    <span class="stat-description">Equipos en inventario</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Racks registrados</span>
+                    <h2 id="totalRacks">0</h2>
+                    <span class="stat-description">Ubicaciones disponibles</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Fabricantes</span>
+                    <h2 id="totalVendors">0</h2>
+                    <span class="stat-description">Marcas identificadas</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Ocupación promedio</span>
+                    <h2 id="ocupacion">0%</h2>
+                    <span class="stat-description">Uso estimado de unidades U</span>
+                </article>
+            </section>
+
+            <section class="content-grid">
+                <article class="panel chart-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Distribución de equipos</h3>
+                            <p>Inventario por fabricante</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="vendorChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="panel rack-panel" id="racks">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Estado de los racks</h3>
+                            <p>Capacidad utilizada</p>
+                        </div>
+                    </div>
+                    <div id="rackSummary" class="rack-summary">
+                        <p class="empty-message">Todavía no hay racks registrados.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="panel inventory-panel" id="inventario">
+                <div class="inventory-heading">
+                    <div>
+                        <h3>Inventario de equipos</h3>
+                        <p>Consulta y administra los dispositivos registrados.</p>
+                    </div>
+                    <button class="primary-button" id="addEquipment">+ Agregar equipo</button>
+                </div>
+
+                <div class="filters">
+                    <input type="search" id="searchInput" placeholder="Buscar equipo, IP o función...">
+                    <select id="vendorFilter">
+                        <option value="">Todos los fabricantes</option>
+                        <option value="Cisco">Cisco</option>
+                        <option value="Huawei">Huawei</option>
+                    </select>
+                    <select id="rackFilter">
+                        <option value="">Todos los racks</option>
+                    </select>
+                    <button class="secondary-button" id="exportCsv">Exportar CSV</button>
+                    <label class="secondary-button file-button">
+                        Importar CSV
+                        <input type="file" id="importCsv" accept=".csv" hidden>
+                    </label>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>EQUIPO</th>
+                                <th>FABRICANTE</th>
+                                <th>RACK</th>
+                                <th>UNIDAD U</th>
+                                <th>DIRECCIÓN IP</th>
+                                <th>FUNCIÓN</th>
+                                <th>ENERGÍA</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody">
+                            <tr>
+                                <td colspan="8" class="empty-message">Cargando inventario...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer id="actividad">
+                RackView · Sistema de gestión de infraestructura
+                <span>Versión 1.0.0</span>
+            </footer>
+        </main>
+    </div>
+
+    <div class="modal" id="equipmentModal">
+        <form class="modal-content" id="equipmentForm">
+            <div class="modal-heading">
+                <div>
+                    <h2>Registrar equipo</h2>
+                    <p>Completa la información del dispositivo.</p>
+                </div>
+                <button type="button" class="close-button" id="closeModal">×</button>
+            </div>
+
+            <label>Nombre del equipo
+                <input name="equipo" required placeholder="Ej. Switch principal">
+            </label>
+            <label>Fabricante
+                <select name="vendor" required>
+                    <option value="">Seleccionar</option>
+                    <option>Cisco</option>
+                    <option>Huawei</option>
+                    <option>Otro</option>
+                </select>
+            </label>
+            <label>Rack
+                <input name="rack" required placeholder="Ej. Rack-01">
+            </label>
+            <label>Ubicación U
+                <input name="ubicacion_u" required placeholder="Ej. U01-U02">
+            </label>
+            <label>Dirección IP
+                <input name="ip" placeholder="Ej. 192.168.1.10">
+            </label>
+            <label>Función
+                <input name="funcion" required placeholder="Ej. Switch de red">
+            </label>
+            <label>Consumo eléctrico
+                <input name="energia" placeholder="Ej. 250 W">
+            </label>
+            <label>Interfaces
+                <input name="interfaces" placeholder="Ej. 24 puertos">
+            </label>
+            <button type="submit" class="primary-button">Guardar equipo</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
